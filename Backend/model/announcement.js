@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 const AnnouncementSchema = new Schema({
     date: {
         type: Date,
-        default: Date.now,
     },
     description: {
         type: String,

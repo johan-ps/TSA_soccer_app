@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white', //'#F8F3F2',
         overflow: 'hidden',
         marginBottom: 10,
-        // elevation: 8
     },
     imageContainer: {
         height: 300,

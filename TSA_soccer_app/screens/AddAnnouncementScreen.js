@@ -17,6 +17,7 @@ const imgPickerOptions = {
 
 const AddAnnounementScreen = props => { 
     const [imageUrl, setImageUrl] = useState(null);
+    const [imageRes, setImageRes] = useState(null);
     const [caption, setCaption] = useState('');
     const dispatch = useDispatch();
 
@@ -27,7 +28,11 @@ const AddAnnounementScreen = props => {
                     <HeaderButtons HeaderButtonComponent={HeaderButton}>
                         <Item title='Menu' iconName='md-send' onPress={() => {
                             if (true) {
-                                dispatch(announcementActions.createAnnouncement(imageUrl, caption))
+                                try {
+                                    dispatch(announcementActions.createAnnouncement(imageRes, caption))
+                                } catch (err) {
+                                    console.log(error);
+                                }
                             }
                             props.navigation.goBack();
                         }} />
@@ -45,6 +50,14 @@ const AddAnnounementScreen = props => {
                 // console.log(response.error);
             } else {
                 setImageUrl(response.uri);
+                setImageRes({
+                    fileName: response.fileName,
+                    path: response.path,
+                    type: response.type,
+                    uri: response.uri,
+                    width: response.width,
+                    height: response.height,
+                });
             }
         })
     }
