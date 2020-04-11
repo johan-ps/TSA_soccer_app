@@ -3,13 +3,14 @@ import { View, Text, FlatList, StyleSheet, ActivityIndicator, Button } from 'rea
 import { useSelector, useDispatch } from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
 
+import MaterialButton from '../components/MaterialButton';
 import AnnouncementCard from '../components/AnnouncementCard';
 import AddButton from '../components/AddButton';
 import * as announcementActions from '../store/actions/announcements';
 import Colors from '../constants/colours/light_theme';
 
 const AnnouncementsScreen = props => {
-    const [error, setError]  = useState();
+    const [error, setError]  = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const announcements = useSelector(state => state.announcements);
@@ -24,7 +25,14 @@ const AnnouncementsScreen = props => {
             setError(err.message);
         }            
         setIsRefreshing(false);
-    }, [dispatch, setIsLoading, setError]);
+    }, [dispatch, setIsLoading, setError, setIsRefreshing]);
+
+    // useEffect(() => {
+    //     const unsubscribe = props.navigation.addListener('focus', () => {
+    //         loadAnnouncements();
+    //     });
+    //     return unsubscribe;
+    // }, [props.navigation]);
 
     useFocusEffect(
         useCallback(() => {
@@ -51,9 +59,10 @@ const AnnouncementsScreen = props => {
     if (!isLoading && announcements.length === 0) {
         return (
             <View style={styles.centered}>
-                <Text>No announcements found.</Text>
+                <Text style={{fontSize: 18, marginBottom: 10}}>No announcements found.</Text>
+                <Button title="Try Again" size={20} color={Colors.primaryColor2} onPress={loadAnnouncements} />
                 <AddButton onPress={() => {
-                    props.navigation.navigate({name: 'AddAnnouncement'});
+                    props.navigation.navigate('AddAnnouncement', {mode: 'create', announcementData: null});
                 }} />
             </View>
         )
@@ -62,7 +71,7 @@ const AnnouncementsScreen = props => {
     if (error) {
         return (
             <View style={styles.centered}>
-                <Text>An error occured.</Text>
+                <Text style={{fontSize: 18, marginBottom: 10}}>An error occured.</Text>
                 <Button title="Reload page" onPress={loadAnnouncements} color={Colors.primaryColor1} />
             </View>
         )
@@ -82,7 +91,7 @@ const AnnouncementsScreen = props => {
                 }}
             />
             <AddButton onPress={() => {
-                props.navigation.navigate({name: 'AddAnnouncement'});
+                props.navigation.navigate('AddAnnouncement', {mode: 'create', announcementData: null});
             }} />
         </View>
     );

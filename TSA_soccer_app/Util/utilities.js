@@ -61,3 +61,17 @@ export const prettyPrintDate = (date) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
     return daysOfWeek[date.getDay()] + ', ' + months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
 }
+
+export const sortByDate = (data) => {
+    function compareDate (a, b) {
+        if (a.date < b.date) {
+            return -1;
+        }
+        if (a.date > b.date) {
+            return 1;
+        }
+        return 0;
+    }
+    data.sort(compareDate);
+    return data;
+}

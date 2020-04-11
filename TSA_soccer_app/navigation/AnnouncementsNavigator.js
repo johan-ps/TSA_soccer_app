@@ -30,7 +30,7 @@ const AnnouncementsNavigator = () => {
                 }
             })} />
             <AnnouncementStackNav.Screen name="AddAnnouncement" component={AddAnnouncementScreen} options={({route, navigation}) => ({
-                title: 'New Announcement',
+                title: 'Create Announcement',
                 headerTintColor: 'white',
                 headerStyle: {
                     backgroundColor: Colors.primaryColor1,

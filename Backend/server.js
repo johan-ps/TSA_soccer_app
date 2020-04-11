@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
+// app.use('/uploads', express.static('uploads'));
 
 const connectToDb = async () => {
     try {
@@ -15,6 +16,7 @@ const connectToDb = async () => {
 }
 connectToDb().then(() => {
     const api = require('./routes/index');
+    mongoose.set('useFindAndModify', false);
 
     app.use('/api/', api);
 

@@ -5,6 +5,9 @@ const AnnouncementSchema = new Schema({
     date: {
         type: Date,
     },
+    title: {
+        type: String,
+    },
     description: {
         type: String,
     },

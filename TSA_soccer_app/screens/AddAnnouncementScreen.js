@@ -8,6 +8,7 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 import * as announcementActions from '../store/actions/announcements';
 import HeaderButton from '../components/headerButton';
+import MultiSelectDropdown from '../components/MultiSelectDropdown';
 
 const imgPickerOptions = {
     title: 'Add a Photo for Your Announcement',
@@ -16,9 +17,28 @@ const imgPickerOptions = {
 };
 
 const AddAnnounementScreen = props => { 
-    const [imageUrl, setImageUrl] = useState(null);
-    const [imageRes, setImageRes] = useState(null);
-    const [caption, setCaption] = useState('');
+    const desc = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed dui sapien, gravida at justo et, dapibus malesuada odio. Morbi eget fermentum lacus. Aenean dictum mauris nibh,`;
+    const imageUrls = [
+        null,
+        null,
+        'https://images.unsplash.com/photo-1545559054-8f4f9e855781?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1558258695-39d4595e049c?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1536536982624-06c1776e0ca8?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1543793870-4317361ff7e6?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1550184816-3eeadf82295f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1549074699-3761f0ecc66a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1562873656-4fbe35b24826?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
+    ];
+    const { mode } = props.route.params;
+    const { announcementData } = props.route.params;
+    const initFormData = {
+        imageUrl: mode === 'edit' && announcementData ? announcementData.imageUrl : imageUrls[Math.floor(Math.random()*8) + 1],
+        desc: mode === 'edit'&& announcementData ? announcementData.description : desc,
+        title: mode === 'edit' && announcementData ? announcementData.title : 'Sample Title ' + Math.round(Math.random() * 1000000).toString(),
+    }
+    const [imageUrl, setImageUrl] = useState(initFormData.imageUrl);
+    const [caption, setCaption] = useState(initFormData.desc);
+    const [title, setTitle] = useState(initFormData.title);
     const dispatch = useDispatch();
 
     useLayoutEffect(() => {
@@ -27,20 +47,24 @@ const AddAnnounementScreen = props => {
                 return (
                     <HeaderButtons HeaderButtonComponent={HeaderButton}>
                         <Item title='Menu' iconName='md-send' onPress={() => {
-                            if (true) {
-                                try {
-                                    dispatch(announcementActions.createAnnouncement(imageRes, caption))
-                                } catch (err) {
-                                    console.log(error);
+                            try {
+                                if (mode === 'create') {
+                                    dispatch(announcementActions.createAnnouncement(title, imageUrl, caption));
+                                } else if (mode === 'edit') {
+                                    dispatch(announcementActions.updateAnnouncement(announcementData.id, title, imageUrl,
+                                        caption, announcementData.date));
                                 }
+                            } catch (err) {
+                                console.log(err);
                             }
                             props.navigation.goBack();
                         }} />
                     </HeaderButtons>
                 )
-            }
+            },
+            title: mode === 'edit' ? 'Edit Announcement' : 'Create Announcement'
         });
-    }, [props.navigation, imageUrl, caption]);
+    }, [props.navigation, imageUrl, caption, title]);
 
     const addImage = () => {
         ImagePicker.showImagePicker(imgPickerOptions, (response) => {
@@ -50,14 +74,6 @@ const AddAnnounementScreen = props => {
                 // console.log(response.error);
             } else {
                 setImageUrl(response.uri);
-                setImageRes({
-                    fileName: response.fileName,
-                    path: response.path,
-                    type: response.type,
-                    uri: response.uri,
-                    width: response.width,
-                    height: response.height,
-                });
             }
         })
     }
@@ -66,8 +82,13 @@ const AddAnnounementScreen = props => {
         setCaption(value);
     }
 
+    const onTitleChangeHandler = (value) => {
+        setTitle(value);
+    }
+
     return (
         <View style={styles.formWrapper}>
+            {/* <MultiSelectDropdown style={styles.multiSelect} /> */}
             <TouchableNativeFeedback onPress={addImage}>
                 <View style={styles.imageUpload}>
                     {!imageUrl ?
@@ -80,6 +101,12 @@ const AddAnnounementScreen = props => {
                 </View>
             </TouchableNativeFeedback>
             <View style={styles.details}>
+                <TextInput style={styles.title} placeholder="Title..."
+                    onChangeText={onTitleChangeHandler} value={title}                
+                >
+                </TextInput>
+            </View>
+            <View style={styles.details}>
                 <TextInput style={styles.caption} multiline={true} placeholder="Write a caption..."
                     onChangeText={onCaptionChangeHandler} value={caption}                
                 >
@@ -91,7 +118,10 @@ const AddAnnounementScreen = props => {
 
 const styles = StyleSheet.create({
     formWrapper: {
-        margin: 10,
+        margin: 20,
+    },
+    multiSelect: {
+        marginBottom: 10
     },
     imageUpload: {
         height: 300,
@@ -114,6 +144,10 @@ const styles = StyleSheet.create({
     uploadText: {
         fontSize: 24,
         fontWeight: "bold",
+    },
+    title: {
+        borderBottomColor: 'black',
+        borderBottomWidth: 1
     },
     caption: {
         borderWidth: 1,
