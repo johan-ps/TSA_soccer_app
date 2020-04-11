@@ -5,7 +5,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import ReduxThunk from 'redux-thunk';
-import { enableScreens } from 'react-native-screens';
 
 import MainNavigator from './navigation/MainNavigator';
 import scheduleReducer from './store/reducers/schedule';
@@ -16,8 +15,6 @@ const rootReducer = combineReducers({
   announcements: announcementReducer,
 })
 const  store = createStore(rootReducer, applyMiddleware(ReduxThunk));
-
-enableScreens();
 
 export default function App() {
   return (

@@ -30,7 +30,6 @@ const announcementReducer = (state = INITIAL_STATE, action) => {
                 action.announcementData.author,
                 action.announcementData.imageUrl
             );
-            console.log(updatedAnnouncement);
             const newState = [...state];
             newState[announcementUpdatedIndex] = updatedAnnouncement;
             return newState;

@@ -73,15 +73,6 @@ export const createAnnouncement = (title, imageUrl, caption) => {
 export const updateAnnouncement = (id, title, imageUrl, caption, date) => {
     return async dispatch => {
         try {
-            const announcement = {
-                date: date,
-                title: title,
-                description: caption,
-                type: 'info',
-                author: 'Gryffin',
-                imageUrl: imageUrl,
-            }
-            console.log(announcement)
             const response = await fetch(`http://${environmentUrl}/api/announcements/update`, {
                 method: 'PUT',
                 headers: {
@@ -105,7 +96,6 @@ export const updateAnnouncement = (id, title, imageUrl, caption, date) => {
             }
 
             const resData = await response.json();
-            console.log(resData);
 
             dispatch({
                 type: UPDATE_ANNOUNCEMENT,
@@ -143,7 +133,6 @@ export const deleteAnnouncement = (id) => {
             }
 
             const resData = await response.json();
-            console.log(resData);
 
             dispatch({
                 type: DELETE_ANNOUNCEMENT,
