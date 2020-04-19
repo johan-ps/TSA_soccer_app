@@ -1,8 +1,6 @@
 import Announcement from '../../models/announcement';
-
+import { environmentUrl } from '../../config';
 import { sortByDate } from '../../Util/utilities';
-
-const environmentUrl = '192.168.2.23:3000';//'10.0.2.2:3000'; //192.168.2.23:3000
 
 export const GET_ANNOUNCEMENTS = 'GET_ANNOUNCEMENT';
 export const CREATE_ANNOUNCEMENT = 'CREATE_ANNOUNCEMENT';

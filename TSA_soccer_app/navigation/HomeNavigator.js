@@ -12,7 +12,7 @@ const HomeBottomTabNav = createMaterialBottomTabNavigator();
 const HomeScreen = props => {
     return (
         <HomeBottomTabNav.Navigator activeColor={Colors.primaryColor1} inactiveColor={Colors.disabled} 
-            barStyle={{ backgroundColor: 'white' }} initialRouteName='Announcements'
+            barStyle={{ backgroundColor: 'white' }} initialRouteName='Schedule'
         >
             <HomeBottomTabNav.Screen name="Help" children={AnnouncementNavigator} options={{
                 tabBarLabel: 'Help',

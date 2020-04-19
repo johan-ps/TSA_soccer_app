@@ -16,7 +16,7 @@ const AnnouncementCard = props => {
 
     const onEditAnnouncementHandler = () => {
         const announcementData = JSON.parse(JSON.stringify(props.item));
-        navigation.navigate('AddAnnouncement', {mode: 'edit', announcementData: announcementData });
+        navigation.navigate('AddAnnouncement', {isEdit: true, announcementData: announcementData });
     }
 
     const onDeleteHandler = () => {
@@ -52,10 +52,8 @@ const AnnouncementCard = props => {
             </View>
             <View style={styles.contentFooter}>
                 <View style={styles.buttonWrapper}>
-                    <MaterialButton size={14} title="Edit" color={Colors.primaryColor2} backgroundColor="white"
-                        onPress={onEditAnnouncementHandler} />
-                    <MaterialButton size={14} title="Delete" color={Colors.primaryColor2} backgroundColor="white"
-                        onPress={onDeleteHandler} />
+                    <MaterialButton size={14} title="Edit" color={Colors.primaryColor2} onPress={onEditAnnouncementHandler} />
+                    <MaterialButton size={14} title="Delete" color={Colors.primaryColor2} onPress={onDeleteHandler} />
                 </View>
                 <Text style={{color: 'black'}}>{Util.getTime(props.item.date)}</Text>
             </View>

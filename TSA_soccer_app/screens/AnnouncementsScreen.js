@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, Button } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
+import Icon from 'react-native-vector-icons/Ionicons'
 
 import MaterialButton from '../components/MaterialButton';
 import AnnouncementCard from '../components/AnnouncementCard';
 import AddButton from '../components/AddButton';
 import * as announcementActions from '../store/actions/announcements';
 import Colors from '../constants/colours/light_theme';
+import HeaderButton from '../components/headerButton';
 
 const AnnouncementsScreen = props => {
     const [error, setError]  = useState(false);
@@ -27,13 +31,6 @@ const AnnouncementsScreen = props => {
         setIsRefreshing(false);
     }, [dispatch, setIsLoading, setError, setIsRefreshing]);
 
-    // useEffect(() => {
-    //     const unsubscribe = props.navigation.addListener('focus', () => {
-    //         loadAnnouncements();
-    //     });
-    //     return unsubscribe;
-    // }, [props.navigation]);
-
     useFocusEffect(
         useCallback(() => {
             const loadAnnouncementsOnFocus = loadAnnouncements;
@@ -47,6 +44,44 @@ const AnnouncementsScreen = props => {
             setIsLoading(false);
         });
     }, [dispatch, loadAnnouncements]);
+
+    _menu = null;
+
+    setMenuRef = ref => {
+        _menu = ref;
+    };
+
+    hideMenu = () => {
+        _menu.hide();
+    };
+
+    showMenu = () => {
+        _menu.show();
+    };
+
+    useLayoutEffect(() => {
+        props.navigation.setOptions({
+            headerRight: () => {
+                return (
+                    <View style={{flexDirection: 'row'}}>
+                        <HeaderButtons HeaderButtonComponent={HeaderButton}>
+                            <Item title='Menu' iconName='md-search' onPress={() => {}} />
+                        </HeaderButtons>
+                        <Menu
+                            ref={setMenuRef}
+                            button={<HeaderButtons HeaderButtonComponent={HeaderButton}>
+                                        <Item title='Menu' iconName='md-more' onPress={showMenu} />
+                                    </HeaderButtons>}
+                        >
+                            <MenuItem onPress={hideMenu}>Sort</MenuItem>
+                            <MenuDivider />
+                            <MenuItem onPress={hideMenu}>Filter</MenuItem>
+                        </Menu>
+                    </View>
+                )
+            },
+        });
+    }, [props.navigation]);
 
     if (isLoading) {
         return (
@@ -62,7 +97,7 @@ const AnnouncementsScreen = props => {
                 <Text style={{fontSize: 18, marginBottom: 10}}>No announcements found.</Text>
                 <Button title="Try Again" size={20} color={Colors.primaryColor2} onPress={loadAnnouncements} />
                 <AddButton onPress={() => {
-                    props.navigation.navigate('AddAnnouncement', {mode: 'create', announcementData: null});
+                    props.navigation.navigate('AddAnnouncement', {isEdit: false, announcementData: null});
                 }} />
             </View>
         )
@@ -91,7 +126,7 @@ const AnnouncementsScreen = props => {
                 }}
             />
             <AddButton onPress={() => {
-                props.navigation.navigate('AddAnnouncement', {mode: 'create', announcementData: null});
+                props.navigation.navigate('AddAnnouncement', {isEdit: false, announcementData: null});
             }} />
         </View>
     );

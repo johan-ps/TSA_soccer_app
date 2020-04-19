@@ -20,13 +20,21 @@ export const formatStatus = (status) => {
 }
 
 export const formatTime = (time) => {
-    const hours = time.getHours() % 12;
-    const min = time.getMinutes();
+    let hours = time.getHours() % 12;
+    let min = time.getMinutes();
+    let suffix;
     if (time.getHours() > 12) {
-        return hours + ':' + min + ' pm';
+        suffix = ' pm';
     } else {
-        return hours + ':' + min + ' am';
+        suffix = ' am';
     }
+    if (min < 10) {
+        min = min + '0';
+    }
+    if (hours === 0) {
+        hours = 12;
+    }
+    return hours + ':' + min + suffix;
 }
 
 export const getTime = (date) => {

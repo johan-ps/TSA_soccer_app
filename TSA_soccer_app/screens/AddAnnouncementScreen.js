@@ -1,14 +1,18 @@
 import React, {useState, useLayoutEffect} from 'react';
-import { View, Text, StyleSheet, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, Animated, Easing } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import { TextField } from 'react-native-material-textfield';
 
-import { TouchableNativeFeedback } from 'react-native-gesture-handler';
 import * as announcementActions from '../store/actions/announcements';
 import HeaderButton from '../components/headerButton';
 import MultiSelectDropdown from '../components/MultiSelectDropdown';
+import MaterialInput from '../components/MaterialInput';
+import Ripple from 'react-native-material-ripple';
+import Colours from '../constants/colours/light_theme';
 
 const imgPickerOptions = {
     title: 'Add a Photo for Your Announcement',
@@ -29,12 +33,12 @@ const AddAnnounementScreen = props => {
         'https://images.unsplash.com/photo-1549074699-3761f0ecc66a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
         'https://images.unsplash.com/photo-1562873656-4fbe35b24826?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60',
     ];
-    const { mode } = props.route.params;
+    const { isEdit } = props.route.params;
     const { announcementData } = props.route.params;
     const initFormData = {
-        imageUrl: mode === 'edit' && announcementData ? announcementData.imageUrl : imageUrls[Math.floor(Math.random()*8) + 1],
-        desc: mode === 'edit'&& announcementData ? announcementData.description : desc,
-        title: mode === 'edit' && announcementData ? announcementData.title : 'Sample Title ' + Math.round(Math.random() * 1000000).toString(),
+        imageUrl: isEdit && announcementData ? announcementData.imageUrl : imageUrls[Math.floor(Math.random()*8) + 1],
+        desc: isEdit && announcementData ? announcementData.description : desc,
+        title: isEdit && announcementData ? announcementData.title : 'Sample Title ' + Math.round(Math.random() * 1000000).toString(),
     }
     const [imageUrl, setImageUrl] = useState(initFormData.imageUrl);
     const [caption, setCaption] = useState(initFormData.desc);
@@ -48,11 +52,11 @@ const AddAnnounementScreen = props => {
                     <HeaderButtons HeaderButtonComponent={HeaderButton}>
                         <Item title='Menu' iconName='md-send' onPress={() => {
                             try {
-                                if (mode === 'create') {
-                                    dispatch(announcementActions.createAnnouncement(title, imageUrl, caption));
-                                } else if (mode === 'edit') {
+                                if (isEdit) {
                                     dispatch(announcementActions.updateAnnouncement(announcementData.id, title, imageUrl,
                                         caption, announcementData.date));
+                                } else {
+                                    dispatch(announcementActions.createAnnouncement(title, imageUrl, caption));
                                 }
                             } catch (err) {
                                 console.log(err);
@@ -62,9 +66,52 @@ const AddAnnounementScreen = props => {
                     </HeaderButtons>
                 )
             },
-            title: mode === 'edit' ? 'Edit Announcement' : 'Create Announcement'
+            title: isEdit ? 'Edit Announcement' : 'New Announcement'
         });
     }, [props.navigation, imageUrl, caption, title]);
+
+    const items = [
+        {
+            name: 'House League',
+            id: 0,
+            children: [
+            {
+                name: 'Markham House League',
+                id: 10,
+            },
+            {
+                name: 'Scarborough House League',
+                id: 17,
+            }
+            ],
+        },
+        {
+            name: 'Rep',
+            id: 1,
+            children: [
+                {
+                    name: 'U14',
+                    id: 13,
+                },
+                {
+                    name: 'U11',
+                    id: 14,
+                },
+                {
+                    name: 'U10',
+                    id: 15,
+                },
+                {
+                    name: 'U9',
+                    id: 16,
+                },
+            ]
+        }
+    ];
+
+    const focusAnimation = new Animated.Value(0);
+
+    const [selectedItems, setSelectedItems] = useState([]);
 
     const addImage = () => {
         ImagePicker.showImagePicker(imgPickerOptions, (response) => {
@@ -86,31 +133,130 @@ const AddAnnounementScreen = props => {
         setTitle(value);
     }
 
+    const onSelectedItemsChange = (selectedItems) => {
+        setSelectedItems(selectedItems);
+    };
+
+    const onFocusInCancelImg = () => {
+        Animated.timing(focusAnimation, {
+            toValue: 1,
+            duration: 225,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true
+        }).start();
+    }
+
+    const onFocusOutCancelImg = () => {
+        Animated.timing(focusAnimation, {
+            toValue: 0,
+            duration: 225,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true
+        }).start();
+    }
+
+    const onCancelImgHandler = () => {
+        setImageUrl(null);
+    }
+
+    const cancelImg = {
+        transform: [{
+            scale: focusAnimation.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0.8],
+            }),
+        }]
+        // opacity: focusAnimation.interpolate({
+        //     inputRange: [0, 1],
+        //     outputRange: [1, 0.5],
+        // }),
+    }
+
+    titleRef = React.createRef();
+
+    const onSubmitTitle = () => {
+        let { current: field } = titleRef;
+    
+        console.log(field.value());
+    };
+
+    descRef = React.createRef();
+
+    const onSubmitDesc = () => {
+        let { current: field } = descRef;
+    
+        console.log(field.value());
+    };
+    
+    formatText = (text) => {
+        return text;
+        // return text.replace(/[^+\d]/g, '');
+    };
+
     return (
         <View style={styles.formWrapper}>
             {/* <MultiSelectDropdown style={styles.multiSelect} /> */}
-            <TouchableNativeFeedback onPress={addImage}>
-                <View style={styles.imageUpload}>
-                    {!imageUrl ?
-                        <View style={styles.addImageWrapper}>
-                            <Icon name="md-images" size={80} />
-                            <Text style={styles.uploadText}>Add a Photo</Text>
-                        </View> :
-                        <Image style={styles.image} source={{uri: imageUrl}} resizeMode='cover' />
-                    }
-                </View>
-            </TouchableNativeFeedback>
-            <View style={styles.details}>
-                <TextInput style={styles.title} placeholder="Title..."
-                    onChangeText={onTitleChangeHandler} value={title}                
-                >
-                </TextInput>
+            {/* <MaterialInput placeholder="Title" onChangeText={onTitleChangeHandler} value={title} />
+            <MaterialInput placeholder="Description" onChangeText={onCaptionChangeHandler} value={caption}
+                multiline={true} /> */}
+            <View style={styles.textFieldContainer}>
+                <TextField 
+                    label='Title'
+                    formatText={formatText}
+                    onSubmitEditing={onSubmitTitle}
+                    ref={titleRef}
+                    value={title}
+                    tintColor="#009688"
+                />
             </View>
-            <View style={styles.details}>
-                <TextInput style={styles.caption} multiline={true} placeholder="Write a caption..."
-                    onChangeText={onCaptionChangeHandler} value={caption}                
-                >
-                </TextInput>
+            <View style={styles.textFieldContainer}>
+                <TextField 
+                    label='Description'
+                    formatText={formatText}
+                    onSubmitEditing={onSubmitDesc}
+                    ref={descRef}
+                    value={caption}
+                    tintColor="#009688"
+                    multiline={true}
+                />
+            </View>
+            <SectionedMultiSelect
+                items={items}
+                uniqueKey="id"
+                subKey="children"
+                selectText="Choose teams to post to..."
+                showDropDowns={true}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={onSelectedItemsChange}
+                selectedItems={selectedItems}
+                highlightChildren={true}
+                showCancelButton={true}
+                showChips={false}
+                selectChildren={true}
+                colors={{
+                    success: Colours.primaryColor1,
+                    primary: Colours.primaryColor1,
+                }}
+            />
+
+            <View style={styles.imagePicker}>
+                {imageUrl ?
+                    (<View style={styles.imagePreview}>
+                        <Ripple onPressIn={onFocusInCancelImg} style={styles.closePos} onPress={onCancelImgHandler}
+                            onPressOut={onFocusOutCancelImg} rippleOpacity={0}>
+                            <Animated.View style={[styles.removeImage, cancelImg]}>
+                                <Icon name="ios-close" color="white" size={26} />
+                            </Animated.View>
+                        </Ripple>
+                        <Image style={styles.image} source={{uri: imageUrl}} resizeMode='cover' />
+                    </View>) : 
+                    (<Ripple style={styles.addImageRipple} onPress={addImage}>
+                        <View style={styles.addImageWrapper}>
+                            <Icon name="md-images" size={60} />
+                            <Text style={styles.uploadText}>Add a Photo</Text>
+                        </View>
+                    </Ripple>)
+                }
             </View>
         </View>
     )
@@ -120,29 +266,67 @@ const styles = StyleSheet.create({
     formWrapper: {
         margin: 20,
     },
+    textFieldContainer: {
+        marginBottom: 10
+    },
     multiSelect: {
         marginBottom: 10
     },
-    imageUpload: {
-        height: 300,
+    imagePicker: {
+        width: '100%',
+        height: 200,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    addImageRipple: {
+        height: '100%',
+        width: '80%',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'black'
+        borderColor: 'black',
+        borderStyle: "dashed",
+        borderRadius: 5,
+        borderWidth: 2,
+        flexDirection: 'row',
+    },
+    addImageWrapper: {
+        height: '100%',
+        width: '100%',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imagePreview: {
+        height: '100%',
+        width: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
+        borderColor: 'grey',
+        borderWidth: 5,
+    },
+    removeImage: {
+        width: 40,
+        height: 40,
+        backgroundColor: 'grey',
+        justifyContent: 'center',
+        alignItems: 'center',        
+        borderRadius: 50,
+        overflow: 'hidden'
+    },
+    closePos: {
+        position: 'absolute',
+        top: -18,
+        right: -18,
+        zIndex: 10,
     },
     details: {
         marginTop: 10,
     },
-    addImageWrapper: {
-        borderRadius: 50,
-        height: 200,
-        width: 200,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     uploadText: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: "bold",
     },
     title: {
@@ -156,7 +340,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: '100%',
-        height: 300,
+        height: '100%',
     },
 })
 

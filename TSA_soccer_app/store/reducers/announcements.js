@@ -2,7 +2,7 @@ import { Announcements } from '../../data/announements';
 import Announcement from '../../models/announcement';
 import { CREATE_ANNOUNCEMENT, GET_ANNOUNCEMENTS, UPDATE_ANNOUNCEMENT, DELETE_ANNOUNCEMENT } from '../actions/announcements';
 
-const INITIAL_STATE = Announcements;
+const INITIAL_STATE = [];
 
 const announcementReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
