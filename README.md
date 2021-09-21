@@ -1,4 +1,4 @@
-# TSA_soccer_app
+# TSA_soccer_app V1
 
 Soccer app for Canadian Titans Soccer Association that allows coaches to manage their teams. Coaches can post announcements, update the schedule for upcoming games and practices, and add players to their teams.
 
